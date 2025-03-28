@@ -1,7 +1,7 @@
 {
 	"name": "nspin-esm",
 	"description": "Lightweight and efficient Node.js spinner package using native features",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"license": "MIT",
 	"author": "ManuelGil",
 	"sponsor": {
@@ -65,7 +65,7 @@
 		"audit": "npm audit",
 		"validate": "npm run lint:check && npm run test && npm run audit",
 		"ci": "npm run clean && npm run build && npm run validate",
-		"prepublishOnly": "npm run build:prod",
+		"prepublishOnly": "npm run build:prod && cp README.npm.md README.md",
 		"publish:local": "npm publish --registry http://localhost:4873",
 		"publish:public": "npm publish --access=public",
 		"prepare": "husky"

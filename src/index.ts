@@ -2,8 +2,7 @@ import { styleText } from 'node:util';
 import { performance } from 'node:perf_hooks';
 
 import { clearLine } from './helpers/console.js';
-import type { FormatOptions } from './types/format-options.js';
-import type { SpinnerOptions } from './types/spinner-options.js';
+import type { FormatOptions, SpinnerOptions } from './types/index.js';
 
 /**
  * Spinner: The spinner class.

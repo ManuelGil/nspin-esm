@@ -1,6 +1,4 @@
-import type { BackgroundColors } from './background-colors.js';
-import type { ForegroundColors } from './foreground-colors.js';
-import type { Modifiers } from './modifiers.js';
+import type { BackgroundColors, ForegroundColors, Modifiers } from './index.js';
 
 /**
  * FormatOptions: The format options.
