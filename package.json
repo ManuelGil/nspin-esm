@@ -1,24 +1,28 @@
 {
 	"name": "nspin-esm",
-	"description": "Lightweight and efficient Node.js spinner package using native features",
-	"version": "1.1.0",
-	"license": "MIT",
-	"author": "ManuelGil",
-	"sponsor": {
-		"url": "https://github.com/sponsors/ManuelGil"
-	},
-	"engines": {
-		"node": ">=22.0.0"
-	},
+	"version": "1.2.0",
+	"description": "Lightweight and efficient ESM spinner package for modern Node.js runtimes",
 	"keywords": [
 		"cli",
-		"lightweight",
-		"native",
-		"Node.js",
+		"console",
+		"esm",
+		"loader",
+		"node",
 		"nodejs",
-		"nspin-esm",
-		"spinner"
+		"spinner",
+		"terminal",
+		"tty"
 	],
+	"author": {
+		"name": "Manuel Gil",
+		"email": "support@imgil.dev",
+		"url": "https://imgil.dev/"
+	},
+	"license": "MIT",
+	"funding": {
+		"type": "github",
+		"url": "https://github.com/sponsors/ManuelGil"
+	},
 	"homepage": "https://github.com/ManuelGil/nspin-esm",
 	"repository": {
 		"type": "git",
@@ -27,77 +31,96 @@
 	"bugs": {
 		"url": "https://github.com/ManuelGil/nspin-esm/issues"
 	},
-	"main": "dist/index.mjs",
-	"module": "dist/index.mjs",
+	"type": "module",
+	"packageManager": "pnpm@10.0.0",
+	"engines": {
+		"node": ">=22.0.0"
+	},
+	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
-			"import": "./dist/index.mjs"
-		},
-		"./package.json": "./package.json"
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"default": "./dist/index.js"
+		}
 	},
 	"sideEffects": false,
-	"type": "module",
 	"files": [
 		"dist",
-		"CHANGELOG.md",
 		"README.md",
-		"!dist/**/*.map"
+		"CHANGELOG.md",
+		"LICENSE"
 	],
-	"peerDependencies": {
-		"node": ">=22.0.0"
+	"publishConfig": {
+		"access": "public"
 	},
 	"scripts": {
 		"clean": "rm -rf dist",
 		"dev": "vite",
-		"build": "cross-env NODE_ENV=development vite build",
-		"build:prod": "cross-env NODE_ENV=production vite build",
-		"analyze": "cross-env ANALYZE=true vite build",
+		"build": "vite build",
 		"preview": "vite preview",
-		"pretest": "npm run clean && npm run build",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"format": "biome format --write",
-		"lint": "biome lint --write",
-		"lint:check": "biome check --write",
+		"check": "biome check .",
+		"check:fix": "biome check --write .",
 		"ts-check": "tsc --noEmit",
-		"link": "cd dist && npm link",
-		"audit": "npm audit",
-		"validate": "npm run lint:check && npm run test && npm run audit",
-		"ci": "npm run clean && npm run build && npm run validate",
-		"prepublishOnly": "npm run build:prod && cp README.npm.md README.md",
-		"publish:local": "npm publish --registry http://localhost:4873",
-		"publish:public": "npm publish --access=public",
-		"prepare": "husky"
+		"check-exports": "attw --pack --ignore-rules cjs-resolves-to-esm",
+		"audit": "pnpm audit",
+		"audit:fix": "pnpm audit --fix",
+		"deps:update": "pnpm update",
+		"deps:update:latest": "pnpm update --latest",
+		"pack:check": "pnpm pack",
+		"prepare": "pnpm exec husky",
+		"release": "release-it",
+		"prepublishOnly": "pnpm run validate && cp README.npm.md README.md",
+		"postpublish": "git checkout -- README.md",
+		"validate": "pnpm run check && pnpm run ts-check && pnpm run test && pnpm run build"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@commitlint/cli": "^19.8.0",
-		"@commitlint/config-conventional": "^19.8.0",
-		"@rollup/plugin-commonjs": "^28.0.3",
-		"@rollup/plugin-json": "^6.1.0",
-		"@rollup/plugin-node-resolve": "^16.0.1",
-		"@rollup/plugin-replace": "^6.0.2",
-		"@rollup/plugin-swc": "^0.4.0",
-		"@types/node": "^22.13.10",
-		"cross-env": "^7.0.3",
+		"@arethetypeswrong/cli": "^0.18.2",
+		"@biomejs/biome": "^2.4.15",
+		"@commitlint/cli": "^20.5.3",
+		"@commitlint/config-conventional": "^20.5.3",
+		"@types/node": "^22.19.18",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.4.3",
-		"rollup-plugin-peer-deps-external": "^2.2.4",
-		"rollup-plugin-visualizer": "^5.14.0",
-		"terser": "^5.39.0",
-		"typescript": "^5.8.2",
-		"typescript-transform-paths": "^3.5.5",
-		"vite": "^6.2.3",
-		"vite-plugin-compression": "^0.5.1",
-		"vite-plugin-dts": "^4.5.3",
-		"vite-tsconfig-paths": "^5.1.4",
-		"vitest": "^3.0.8"
+		"lint-staged": "^16.4.0",
+		"release-it": "^19.2.4",
+		"typescript": "^5.9.3",
+		"vite": "^8.0.11",
+		"vite-plugin-dts": "^5.0.0",
+		"vitest": "^3.2.4"
 	},
 	"lint-staged": {
-		"*.ts": [
-			"biome format --write",
-			"biome lint --write"
+		"*.{ts,js,json,md}": [
+			"biome check --write"
 		]
+	},
+	"release-it": {
+		"git": {
+			"commitMessage": "chore: :bookmark: release ${version}",
+			"tagName": "v${version}",
+			"requireCleanWorkingDir": true
+		},
+		"github": {
+			"release": true
+		},
+		"npm": {
+			"publish": false
+		},
+		"hooks": {
+			"before:init": "pnpm run validate",
+			"before:release": "pnpm run build"
+		}
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"husky"
+		],
+		"overrides": {
+			"@conventional-changelog/git-client@<2.0.0": ">=2.0.0",
+			"undici@<6.24.0": ">=6.24.0"
+		}
 	}
 }

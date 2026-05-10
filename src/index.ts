@@ -1,5 +1,5 @@
-import { styleText } from 'node:util';
 import { performance } from 'node:perf_hooks';
+import { styleText } from 'node:util';
 
 import { clearLine } from './helpers/console.js';
 import type { FormatOptions, SpinnerOptions } from './types/index.js';
@@ -315,7 +315,7 @@ export class Spinner {
       if (finalText !== undefined) {
         process.stdout.write(finalText + '\n');
       } else {
-        const frame = this.frames[this.currentFrame];
+        const frame = this.frames[this.currentFrame] ?? '';
 
         this.currentFrame = (this.currentFrame + 1) % this.frames.length;
 
@@ -352,7 +352,7 @@ export class Spinner {
     if (finalText !== undefined) {
       output = finalText;
     } else {
-      let frame = this.frames[this.currentFrame];
+      let frame = this.frames[this.currentFrame] ?? '';
 
       this.currentFrame = (this.currentFrame + 1) % this.frames.length;
 
