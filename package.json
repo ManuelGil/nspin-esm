@@ -117,9 +117,6 @@
 		"onlyBuiltDependencies": [
 			"esbuild",
 			"husky"
-		],
-		"overrides": {
-			"undici@<6.24.0": ">=6.24.0"
-		}
+		]
 	}
 }
