@@ -9,10 +9,7 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-
-# Cancel previous runs for the same branch/PR
+# Cancel previous runs for the same branch to avoid duplicated builds
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -22,36 +19,37 @@ jobs:
     name: Validate
     runs-on: ubuntu-latest
 
-    timeout-minutes: 10
-
     steps:
-      # Checkout repository
+      # Checkout full repository history (useful for future release workflows)
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Enable Corepack so the packageManager field is respected
+      # Ensure the package manager version declared in package.json is respected
       - name: Enable Corepack
         run: corepack enable
 
-      # Setup pnpm using the version declared in package.json
+      # Install pnpm explicitly for deterministic CI behavior
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
 
-      # Setup Node.js using .nvmrc
+      # Align Node.js version with local development (.nvmrc)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
 
-      # Install dependencies strictly from lockfile
+      # Install dependencies strictly according to the lockfile
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
 
-      # Run validation pipeline
+      # Validate code quality (non-destructive)
+      # Fails if lint, formatting, or import organization issues exist
       - name: Run validation pipeline
-        run: pnpm run validate
+        run: pnpm validate
 
       # Verify package exports and typings
       - name: Verify package exports
