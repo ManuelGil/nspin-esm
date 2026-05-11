@@ -12,6 +12,11 @@ on:
 permissions:
   contents: read
 
+# Cancel previous runs for the same branch/PR
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: Validate
@@ -20,24 +25,35 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      # Checkout repository
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
+      # Enable Corepack so the packageManager field is respected
+      - name: Enable Corepack
+        run: corepack enable
+
+      # Setup pnpm using the version declared in package.json
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
 
+      # Setup Node.js using .nvmrc
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: ".nvmrc"
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
+      # Install dependencies strictly from lockfile
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prefer-offline
 
+      # Run validation pipeline
       - name: Run validation pipeline
         run: pnpm run validate
 
+      # Verify package exports and typings
       - name: Verify package exports
         run: |
           pnpm pack
