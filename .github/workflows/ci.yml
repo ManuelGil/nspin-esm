@@ -9,49 +9,50 @@ on:
     branches:
       - main
 
-# Cancel previous runs for the same branch to avoid duplicated builds
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     name: Validate
     runs-on: ubuntu-latest
 
+    timeout-minutes: 10
+
     steps:
-      # Checkout full repository history (useful for future release workflows)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Ensure the package manager version declared in package.json is respected
-      - name: Enable Corepack
-        run: corepack enable
-
-      # Install pnpm explicitly for deterministic CI behavior
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      # Align Node.js version with local development (.nvmrc)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-          cache: "pnpm"
-          cache-dependency-path: "pnpm-lock.yaml"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      # Install dependencies strictly according to the lockfile
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@10.0.0 --activate
+
+      - name: Verify versions
+        run: |
+          node --version
+          pnpm --version
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --prefer-offline
 
-      # Validate code quality (non-destructive)
-      # Fails if lint, formatting, or import organization issues exist
       - name: Run validation pipeline
-        run: pnpm validate
+        run: pnpm run validate
 
-      # Verify package exports and typings
       - name: Verify package exports
         run: |
           pnpm pack
